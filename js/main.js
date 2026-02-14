@@ -112,24 +112,12 @@
         nextBtn.addEventListener('click', () => goTo(current + 1));
     });
 
-    // Contact form (frontend only — mostra un messaggio di conferma)
+    // Contact form — invio tramite FormSubmit.co
     const form = document.getElementById('contact-form');
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
+    form.addEventListener('submit', () => {
         const btn = form.querySelector('.btn');
-        const originalText = btn.textContent;
-
-        btn.textContent = 'Messaggio inviato!';
-        btn.style.background = 'var(--color-warm)';
+        btn.textContent = 'Invio in corso...';
         btn.disabled = true;
-
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.style.background = '';
-            btn.disabled = false;
-            form.reset();
-        }, 3000);
     });
 })();
