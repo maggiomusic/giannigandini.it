@@ -112,12 +112,46 @@
         nextBtn.addEventListener('click', () => goTo(current + 1));
     });
 
-    // Contact form — invio tramite FormSubmit.co
+    // Contact form — invio tramite FormSubmit.co (AJAX)
     const form = document.getElementById('contact-form');
 
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
         const btn = form.querySelector('.btn');
+        const originalText = btn.textContent;
         btn.textContent = 'Invio in corso...';
         btn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        })
+        .then((response) => {
+            if (response.ok) {
+                btn.textContent = 'Messaggio inviato!';
+                btn.style.background = 'var(--color-warm)';
+                form.reset();
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+            } else {
+                throw new Error('Errore invio');
+            }
+        })
+        .catch(() => {
+            btn.textContent = 'Errore. Riprova.';
+            btn.style.background = '#c0392b';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 3000);
+        });
     });
 })();
