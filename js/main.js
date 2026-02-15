@@ -129,11 +129,26 @@
             const subject = form.querySelector('#subject').value;
             const message = form.querySelector('#message').value;
 
-            const data = {
+            var mailtoFallback = function () {
+                var body = 'Nome: ' + name + '\nEmail: ' + email + '\nOggetto: ' + subject + '\n\nMessaggio:\n' + message;
+                window.location.href = 'mailto:gandinigianni@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+                btn.textContent = originalText;
+                btn.style.background = '';
+                btn.disabled = false;
+            };
+
+            // Se aperto come file locale, usa direttamente mailto
+            if (window.location.protocol === 'file:') {
+                mailtoFallback();
+                return;
+            }
+
+            var data = {
                 name: name,
                 email: email,
                 subject: subject,
                 message: message,
+                _replyto: email,
                 _subject: 'Nuovo messaggio dal sito giannigandini.it',
                 _captcha: 'false',
                 _template: 'table'
@@ -149,7 +164,7 @@
             })
             .then(function (response) { return response.json(); })
             .then(function (result) {
-                if (result.success) {
+                if (result.success === 'true' || result.success === true) {
                     btn.textContent = 'Messaggio inviato!';
                     btn.style.background = 'var(--color-warm)';
                     form.reset();
@@ -159,16 +174,11 @@
                         btn.disabled = false;
                     }, 3000);
                 } else {
-                    throw new Error('Errore');
+                    mailtoFallback();
                 }
             })
             .catch(function () {
-                // Fallback: apri il client email con i dati compilati
-                var body = 'Nome: ' + name + '\nEmail: ' + email + '\nOggetto: ' + subject + '\n\nMessaggio:\n' + message;
-                window.location.href = 'mailto:gandinigianni@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-                btn.textContent = originalText;
-                btn.style.background = '';
-                btn.disabled = false;
+                mailtoFallback();
             });
         });
     }
